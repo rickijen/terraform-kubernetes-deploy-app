@@ -61,7 +61,7 @@ resource "kubernetes_deployment" "color" {
     metadata {
         name = "color-${var.color}"
         labels = {
-            app   = "color"
+            app   = var.app
             color = var.color
         } //labels
     } //metadata
@@ -69,7 +69,7 @@ resource "kubernetes_deployment" "color" {
     spec {
         selector {
             match_labels = {
-                app   = kubernetes_deployment.color.metadata[0].labels.app
+                app   = var.app
                 color = var.color
             } //match_labels
         } //selector
@@ -81,7 +81,7 @@ resource "kubernetes_deployment" "color" {
         template { 
             metadata {
                 labels = {
-                    app   = kubernetes_deployment.color.spec.0.selector.0.match_labels.app
+                    app   = var.app
                     color = var.color
                 } //labels
             } //metadata
