@@ -11,17 +11,45 @@
 # -------------------------------- WARNING --------------------------------
 
 terraform {
-  required_version = "~> 0.12" #cannot contain interpolations. Means requiered version >= 0.12 and < 0.13
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "2.42.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.0.1"
+    }
+  }
 }
 
-#-----------------------------------------
-# Default provider: Kubernetes
-#-----------------------------------------
+data "terraform_remote_state" "aks" {
+  backend = "remote"
+
+  config = {
+    organization = "greensugarcake"
+    workspaces = {
+      name = "provision-aks-cluster"
+    }
+  }
+}
+
+# Retrieve AKS cluster information
+provider "azurerm" {
+  features {}
+}
+
+data "azurerm_kubernetes_cluster" "cluster" {
+  name                = data.terraform_remote_state.aks.outputs.kubernetes_cluster_name
+  resource_group_name = data.terraform_remote_state.aks.outputs.resource_group_name
+}
 
 provider "kubernetes" {
-  #Context to choose from the config file.
-  config_context = "kubernetes-admin@ditwl-k8s-01"
-  version = "~> 1.12"
+  host = data.azurerm_kubernetes_cluster.cluster.kube_config.0.host
+
+  client_certificate     = base64decode(data.azurerm_kubernetes_cluster.cluster.kube_admin_config.0.client_certificate)
+  client_key             = base64decode(data.azurerm_kubernetes_cluster.cluster.kube_admin_config.0.client_key)
+  cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.cluster.kube_admin_config.0.cluster_ca_certificate)
 }
 
 
@@ -31,18 +59,18 @@ provider "kubernetes" {
 
 resource "kubernetes_deployment" "color" {
     metadata {
-        name = "color-blue-dep"
+        name = "color-${var.color}"
         labels = {
             app   = "color"
-            color = "blue"
+            color = var.color
         } //labels
     } //metadata
     
     spec {
         selector {
             match_labels = {
-                app   = "color"
-                color = "blue"
+                app   = kubernetes_deployment.color.metadata[0].labels.app
+                color = var.color
             } //match_labels
         } //selector
 
@@ -53,20 +81,20 @@ resource "kubernetes_deployment" "color" {
         template { 
             metadata {
                 labels = {
-                    app   = "color"
-                    color = "blue"
+                    app   = kubernetes_deployment.color.spec.0.selector.0.selector[0].match_labels.app
+                    color = var.color
                 } //labels
             } //metadata
 
             spec {
                 container {
                     image = "itwonderlab/color"   #Docker image name
-                    name  = "color-blue"          #Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL).
+                    name  = "color-${var.color}"          #Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL).
                     
                     #Block of string name and value pairs to set in the container's environment
                     env { 
                         name = "COLOR"
-                        value = "blue"
+                        value = var.color
                     } //env
                     
                     #List of ports to expose from the container.
@@ -94,20 +122,19 @@ resource "kubernetes_deployment" "color" {
 # KUBERNETES DEPLOYMENT COLOR SERVICE NODE PORT
 #-------------------------------------------------
 
-resource "kubernetes_service" "color-service-np" {
+resource "kubernetes_service" "color-service" {
   metadata {
-    name = "color-service-np"
+    name = "color-service-${var.color}"
   } //metadata
   spec {
     selector = {
-      app = "color"
+      app = kubernetes_deployment.color.spec.0.template.0.metadata[0].labels.app
     } //selector
-    session_affinity = "ClientIP"
+    //session_affinity = "ClientIP"
     port {
       port      = 8080 
       node_port = 30085
     } //port
-    type = "NodePort"
+    type = "LoadBalancer"
   } //spec
 } //resource
-
