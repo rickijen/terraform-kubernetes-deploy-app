@@ -59,7 +59,7 @@ provider "kubernetes" {
 
 resource "kubernetes_deployment" "color" {
     metadata {
-        name = var.color
+        name = "color-${var.color}"
         labels = {
             app   = "color"
             color = var.color
@@ -89,7 +89,7 @@ resource "kubernetes_deployment" "color" {
             spec {
                 container {
                     image = "itwonderlab/color"   #Docker image name
-                    name  = var.color             #Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL).
+                    name  = "color-${var.color}"          #Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL).
                     
                     #Block of string name and value pairs to set in the container's environment
                     env { 
@@ -103,11 +103,11 @@ resource "kubernetes_deployment" "color" {
                     }//port          
                     
                     resources {
-                        limits {
+                        limits = {
                             cpu    = "0.5"
                             memory = "512Mi"
                         } //limits
-                        requests {
+                        requests = {
                             cpu    = "250m"
                             memory = "50Mi"
                         } //requests
@@ -124,7 +124,7 @@ resource "kubernetes_deployment" "color" {
 
 resource "kubernetes_service" "color-service" {
   metadata {
-    name = var.color
+    name = "color-service-${var.color}"
   } //metadata
   spec {
     selector = {
