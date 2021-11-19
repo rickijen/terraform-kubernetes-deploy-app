@@ -142,3 +142,35 @@ resource "kubernetes_service" "color-service" {
 output "lb_ip" {
   value = kubernetes_service.color-service.status.0.load_balancer.0.ingress.0.ip
 }
+
+# AGIC Ingress
+resource "kubernetes_ingress" "color" {
+  wait_for_load_balancer = true
+  metadata {
+    name = var.app
+    annotations = {
+      "kubernetes.io/ingress.class" = "azure/application-gateway"
+    }
+  }
+  spec {
+    rule {
+      http {
+        path {
+          path = "/${var.color}/*"
+          backend {
+            service_name = kubernetes_service.color-service.metadata.0.name
+            service_port = 8080
+          }
+        }
+      }
+    }
+  }
+}
+
+output "agic_hostname" {
+  value = kubernetes_ingress.example.status.0.load_balancer.0.ingress.0.hostname
+}
+
+output "agic_ip" {
+  value = kubernetes_ingress.example.status.0.load_balancer.0.ingress.0.ip
+}
