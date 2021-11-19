@@ -168,9 +168,9 @@ resource "kubernetes_ingress" "color" {
 }
 
 output "agic_hostname" {
-  value = kubernetes_ingress.example.status.0.load_balancer.0.ingress.0.hostname
+  value = kubernetes_ingress.color.status.0.load_balancer.0.ingress.0.hostname
 }
 
 output "agic_ip" {
-  value = kubernetes_ingress.example.status.0.load_balancer.0.ingress.0.ip
+  value = kubernetes_ingress.color.status.0.load_balancer.0.ingress.0.ip
 }
