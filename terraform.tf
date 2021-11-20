@@ -144,7 +144,7 @@ output "lb_ip" {
 }
 
 # AGIC Ingress
-resource "kubernetes_ingress" "color" {
+resource "kubernetes_ingress" "$${var.color}" {
   wait_for_load_balancer = true
   metadata {
     name = var.app
