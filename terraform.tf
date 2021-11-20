@@ -143,8 +143,19 @@ output "lb_ip" {
   value = kubernetes_service.color-service.status.0.load_balancer.0.ingress.0.ip
 }
 
+# Create AGIC Ingress
+
+module "ingress" {
+  source = "./modules/ingress"
+
+  ingress_class = "azure/application-gateway"
+  k8s_ingress_name = var.color
+  service_port = 8080
+}
+
+/*
 # AGIC Ingress
-resource "kubernetes_ingress" "$${var.color}" {
+resource "kubernetes_ingress" "color" {
   wait_for_load_balancer = true
   metadata {
     name = var.app
@@ -166,7 +177,8 @@ resource "kubernetes_ingress" "$${var.color}" {
     }
   }
 }
-
+*/
+/*
 output "agic_hostname" {
   value = kubernetes_ingress.color.status.0.load_balancer.0.ingress.0.hostname
 }
@@ -174,3 +186,4 @@ output "agic_hostname" {
 output "agic_ip" {
   value = kubernetes_ingress.color.status.0.load_balancer.0.ingress.0.ip
 }
+*/
