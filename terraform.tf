@@ -134,15 +134,17 @@ resource "kubernetes_service" "color-service" {
     port {
       port      = 8080
       target_port = 8080
-      node_port = var.nodeport
+      //node_port = var.nodeport
     } //port
-    type = "LoadBalancer"
+    //type = "LoadBalancer"
   } //spec
 } //resource
 
+/*
 output "lb_ip" {
   value = kubernetes_service.color-service.status.0.load_balancer.0.ingress.0.ip
 }
+*/
 
 # Create AGIC Ingress
 
