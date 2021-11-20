@@ -133,7 +133,7 @@ resource "kubernetes_service" "color-service" {
     //session_affinity = "ClientIP"
     port {
       port      = 8080
-      taregt_port = 8080
+      target_port = 8080
       node_port = var.nodeport
     } //port
     type = "LoadBalancer"
