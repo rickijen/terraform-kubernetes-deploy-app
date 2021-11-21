@@ -152,7 +152,7 @@ module "ingress" {
   source = "./modules/ingress"
 
   ingress_class = "azure/application-gateway"
-  k8s_ingress_name = var.app
+  k8s_ingress_name = var.color
   service_name = var.color
   service_port = 8080
 }
