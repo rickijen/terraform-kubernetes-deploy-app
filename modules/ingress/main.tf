@@ -1,6 +1,6 @@
 # AGIC Ingress
 resource "kubernetes_ingress" "ingress" {
-  wait_for_load_balancer = true
+  #wait_for_load_balancer = true
   metadata {
     name = var.k8s_ingress_name
     annotations = {
@@ -11,7 +11,7 @@ resource "kubernetes_ingress" "ingress" {
     rule {
       http {
         path {
-          #path = "/${var.k8s_ingress_name}"
+          path = "/${var.k8s_ingress_name}"
           #path = "/"
           backend {
             service_name = var.k8s_ingress_name
