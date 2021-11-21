@@ -124,7 +124,7 @@ resource "kubernetes_deployment" "color" {
 
 resource "kubernetes_service" "color-service" {
   metadata {
-    name = "color-service-${var.color}"
+    name = var.color
   } //metadata
   spec {
     selector = {
