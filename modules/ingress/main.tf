@@ -12,7 +12,7 @@ resource "kubernetes_ingress" "ingress" {
       http {
         path {
           #path = "/${var.k8s_ingress_name}"
-          path = "/"
+          #path = "/"
           backend {
             service_name = var.k8s_ingress_name
             service_port = var.service_port
