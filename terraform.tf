@@ -128,7 +128,7 @@ resource "kubernetes_service" "color-service" {
   } //metadata
   spec {
     selector = {
-      app = kubernetes_deployment.color.spec.0.template.0.metadata[0].labels.app
+      app = var.app
     } //selector
     //session_affinity = "ClientIP"
     port {
