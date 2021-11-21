@@ -8,6 +8,11 @@ variable "k8s_ingress_name" {
     description = "Name of ingress"
 }
 
+variable "service_name" {
+    type = string
+    description = "Name of service"
+}
+
 variable "service_port" {
     type = number
     description = "Service port"
