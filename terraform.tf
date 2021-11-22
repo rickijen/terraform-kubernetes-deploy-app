@@ -88,8 +88,8 @@ resource "kubernetes_deployment" "color" {
 
             spec {
                 container {
-                    image = "itwonderlab/color"   #Docker image name
-                    name  = "color-${var.color}"          #Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL).
+                    image = "itwonderlab/color"   # Docker image name
+                    name  = "color-${var.color}"  # Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL).
                     
                     #Block of string name and value pairs to set in the container's environment
                     env { 
@@ -130,7 +130,7 @@ resource "kubernetes_service" "color-service" {
     selector = {
       app = var.app
     } //selector
-    //session_affinity = "ClientIP"
+    session_affinity = "ClientIP"
     port {
       port      = 8080
       target_port = 8080
@@ -140,14 +140,7 @@ resource "kubernetes_service" "color-service" {
   } //spec
 } //resource
 
-/*
-output "lb_ip" {
-  value = kubernetes_service.color-service.status.0.load_balancer.0.ingress.0.ip
-}
-*/
-
 # Create AGIC Ingress
-
 module "ingress" {
   source = "./modules/ingress"
 
@@ -160,38 +153,3 @@ module "ingress" {
 output "app_gw_ip" {
   value = module.ingress.agic_ip
 }
-
-/*
-# AGIC Ingress
-resource "kubernetes_ingress" "color" {
-  wait_for_load_balancer = true
-  metadata {
-    name = var.app
-    annotations = {
-      "kubernetes.io/ingress.class" = "azure/application-gateway"
-    }
-  }
-  spec {
-    rule {
-      http {
-        path {
-          path = "/${var.color}/*"
-          backend {
-            service_name = kubernetes_service.color-service.metadata.0.name
-            service_port = 8080
-          }
-        }
-      }
-    }
-  }
-}
-*/
-/*
-output "agic_hostname" {
-  value = kubernetes_ingress.color.status.0.load_balancer.0.ingress.0.hostname
-}
-
-output "agic_ip" {
-  value = kubernetes_ingress.color.status.0.load_balancer.0.ingress.0.ip
-}
-*/
