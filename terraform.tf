@@ -157,6 +157,10 @@ module "ingress" {
   service_port = 8080
 }
 
+output "app_gw_ip" {
+  value = module.ingress.agic_ip
+}
+
 /*
 # AGIC Ingress
 resource "kubernetes_ingress" "color" {
