@@ -87,6 +87,9 @@ resource "kubernetes_deployment" "color" {
             } //metadata
 
             spec {
+                node_selector = {
+                  "kubernetes.io/os" = "linux"
+                }
                 container {
                     image = "itwonderlab/color"   # Docker image name
                     name  = "color-${var.color}"  # Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL).
