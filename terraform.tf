@@ -29,7 +29,7 @@ data "terraform_remote_state" "aks" {
   config = {
     organization = "greensugarcake"
     workspaces = {
-      name = "provision-aks-cluster"
+      name = "public-aks-cluster"
     }
   }
 }
